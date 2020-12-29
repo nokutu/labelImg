@@ -1,15 +1,13 @@
-dog
-person
-cat
-tv
-car
-meatballs
-marinara sauce
-tomato soup
-chicken noodle soup
-french onion soup
-chicken breast
-ribs
-pulled pork
-hamburger
-cavity
+LL6424_R_C
+LL6420_R_C
+LL6418_R_C
+LL6416_R_C
+LL6413_R_C
+LL6410_R_C
+LL6408_R_C
+LL4310_R_C
+LL4314_R_C
+LL4320_R_C
+ST6424_R_C
+UNKNOWN
+PALLET

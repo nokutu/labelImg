@@ -870,10 +870,16 @@ class MainWindow(QMainWindow, WindowMixin):
             self.errorMessage(u'Error saving label data', u'<b>%s</b>' % e)
             return False
 
+
     def copySelectedShape(self):
-        self.addLabel(self.canvas.copySelectedShape())
+        self.addLabel(self.canvas.copySelectedShape()) 
+        self.canvas.shapes[-1].points = sorted(self.canvas.shapes[-1].points, key=lambda x: x.y(), reverse=False)
+        dif = abs(self.canvas.shapes[-1].points[0].y() - self.canvas.shapes[-1].points[3].y()) + 2
+        for p in self.canvas.shapes[-1].points:
+            p.setY(p.y()+dif)
         # fix copy and delete
         self.shapeSelectionChanged(True)
+
 
     def comboSelectionChanged(self, index):
         text = self.comboBox.cb.itemText(index)

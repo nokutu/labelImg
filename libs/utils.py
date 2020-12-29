@@ -3,6 +3,7 @@ from libs.ustr import ustr
 import hashlib
 import re
 import sys
+import matplotlib.pyplot as plt
 
 try:
     from PyQt5.QtGui import *
@@ -77,13 +78,13 @@ def fmtShortcut(text):
     return '<b>%s</b>+<b>%s</b>' % (mod, key)
 
 
+texts = []
+color_map = [plt.cm.tab20(i) for i in range(20)]
 def generateColorByText(text):
-    s = ustr(text)
-    hashCode = int(hashlib.sha256(s.encode('utf-8')).hexdigest(), 16)
-    r = int((hashCode / 255) % 255)
-    g = int((hashCode / 65025)  % 255)
-    b = int((hashCode / 16581375)  % 255)
-    return QColor(r, g, b, 100)
+    if not text in texts:
+        texts.append(text)
+    color = color_map[texts.index(text) % 20]
+    return QColor(color[0], color[1], color[], 100)
 
 def have_qstring():
     '''p3/qt5 get rid of QString wrapper as py3 has native unicode str type'''
