@@ -84,7 +84,7 @@ class Shape(object):
     def setOpen(self):
         self._closed = False
 
-    def paint(self, painter, force_fill=False, hide_vertices=False):
+    def paint(self, painter, force_fill=False, hide_vertices=False, opaque_fill=False):
         if self.points:
             color = self.select_line_color if self.selected else self.line_color
             pen = QPen(color)
@@ -132,6 +132,10 @@ class Shape(object):
 
             if self.fill or force_fill:
                 color = self.select_fill_color if self.selected else self.fill_color
+                if opaque_fill:
+                    color = QColor(color)
+                    color.setAlpha(255)
+
                 painter.fillPath(line_path, color)
 
     def drawVertex(self, path, i):

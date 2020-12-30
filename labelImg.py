@@ -292,6 +292,13 @@ class MainWindow(QMainWindow, WindowMixin):
         fill = action(text='&Force\nfill', slot=force_fill_,
                       shortcut='F', icon='hide', tip='Test', checkable=True)
 
+        def opaque_fill_(value):
+            self.canvas.opaqueFill = value
+            self.canvas.repaint()
+
+        opaque_fill = action(text='&Opaque\nfill', slot=opaque_fill_,
+                             shortcut='O', icon='hide', tip='Test', checkable=True)
+
         def hide_vertices_(value):
             self.canvas.hideVertices = value
             self.canvas.repaint()
@@ -419,7 +426,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.displayLabelOption,
             labels, advancedMode, None,
             hideAll, showAll, None,
-            fill, hide_vertices, None,
+            fill, opaque_fill, hide_vertices, None,
             zoomIn, zoomOut, zoomOrg, None,
             fitWindow, fitWidth))
 
