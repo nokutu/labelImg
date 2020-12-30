@@ -84,7 +84,7 @@ def generateColorByText(text):
     if not text in texts:
         texts.append(text)
     color = color_map[texts.index(text) % 20]
-    return QColor(color[0], color[1], color[2], 100)
+    return QColor(color[0] * 255, color[1] * 255, color[2] * 255, 100)
 
 def have_qstring():
     '''p3/qt5 get rid of QString wrapper as py3 has native unicode str type'''
