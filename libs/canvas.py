@@ -55,6 +55,10 @@ class Canvas(QWidget):
         self.hVertex = None
         self._painter = QPainter()
         self._cursor = CURSOR_DEFAULT
+
+        # Draw options
+        self.forceFill = False
+        self.hideVertices = False
         # Menus:
         self.menus = (QMenu(), QMenu())
         # Set widget options.
@@ -481,12 +485,12 @@ class Canvas(QWidget):
         for shape in self.shapes:
             if (shape.selected or not self._hideBackround) and self.isVisible(shape):
                 shape.fill = shape.selected or shape == self.hShape
-                shape.paint(p)
+                shape.paint(p, self.forceFill, self.hideVertices)
         if self.current:
             self.current.paint(p)
             self.line.paint(p)
         if self.selectedShapeCopy:
-            self.selectedShapeCopy.paint(p)
+            self.selectedShapeCopy.paint(p, self.forceFill, self.hideVertices)
 
         # Paint rect
         if self.current is not None and len(self.line) == 2:

@@ -79,7 +79,7 @@ def fmtShortcut(text):
 
 
 texts = []
-color_map = [plt.cm.tab20(i) for i in range(20)]
+color_map = [plt.cm.tab20(i*2) for i in range(10)] + [plt.cm.tab20(i*2+1) for i in range(10)]
 def generateColorByText(text):
     if not text in texts:
         texts.append(text)

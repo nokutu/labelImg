@@ -84,7 +84,7 @@ class Shape(object):
     def setOpen(self):
         self._closed = False
 
-    def paint(self, painter):
+    def paint(self, painter, force_fill=False, hide_vertices=False):
         if self.points:
             color = self.select_line_color if self.selected else self.line_color
             pen = QPen(color)
@@ -99,11 +99,12 @@ class Shape(object):
             # Uncommenting the following line will draw 2 paths
             # for the 1st vertex, and make it non-filled, which
             # may be desirable.
-            #self.drawVertex(vrtx_path, 0)
+            # self.drawVertex(vrtx_path, 0)
 
             for i, p in enumerate(self.points):
                 line_path.lineTo(p)
-                self.drawVertex(vrtx_path, i)
+                if not hide_vertices:
+                    self.drawVertex(vrtx_path, i)
             if self.isClosed():
                 line_path.lineTo(self.points[0])
 
@@ -123,13 +124,13 @@ class Shape(object):
                     font.setPointSize(8)
                     font.setBold(True)
                     painter.setFont(font)
-                    if(self.label == None):
+                    if (self.label == None):
                         self.label = ""
-                    if(min_y < MIN_Y_LABEL):
+                    if (min_y < MIN_Y_LABEL):
                         min_y += MIN_Y_LABEL
                     painter.drawText(min_x, min_y, self.label)
 
-            if self.fill or True:
+            if self.fill or force_fill:
                 color = self.select_fill_color if self.selected else self.fill_color
                 painter.fillPath(line_path, color)
 
