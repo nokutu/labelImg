@@ -264,7 +264,7 @@ class MainWindow(QMainWindow, WindowMixin):
         createMode = action(getStr('crtBox'), self.setCreateMode,
                             'w', 'new', getStr('crtBoxDetail'), enabled=False)
         editMode = action('&Edit\nRectBox', self.setEditMode,
-                          'Ctrl+J', 'edit', u'Move and edit Boxs', enabled=False)
+                          'S', 'edit', u'Move and edit Boxs', enabled=False)
 
         create = action(getStr('crtBox'), self.createShape,
                         'w', 'new', getStr('crtBoxDetail'), enabled=False)
