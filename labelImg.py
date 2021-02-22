@@ -392,11 +392,11 @@ class MainWindow(QMainWindow, WindowMixin):
                               onShapesPresent=(saveAs, hideAll, showAll))
 
         self.menus = struct(
-            file=self.menu('&File'),
-            edit=self.menu('&Edit'),
-            view=self.menu('&View'),
-            help=self.menu('&Help'),
-            recentFiles=QMenu('Open &Recent'),
+            file=self.menu(getStr('menu_file')),
+            edit=self.menu(getStr('menu_edit')),
+            view=self.menu(getStr('menu_view')),
+            help=self.menu(getStr('menu_help')),
+            recentFiles=QMenu(getStr('menu_openRecent')),
             labelList=labelMenu)
 
         # Auto saving : Enable auto saving if pressing next
@@ -1170,6 +1170,7 @@ class MainWindow(QMainWindow, WindowMixin):
     def paintCanvas(self):
         assert not self.image.isNull(), "cannot paint null image"
         self.canvas.scale = 0.01 * self.zoomWidget.value()
+        self.canvas.labelFontSize = int(0.02 * max(self.image.width(), self.image.height()))
         self.canvas.adjustSize()
         self.canvas.update()
 
