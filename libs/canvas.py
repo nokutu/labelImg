@@ -1,4 +1,3 @@
-
 try:
     from PyQt5.QtGui import *
     from PyQt5.QtCore import *
@@ -7,7 +6,7 @@ except ImportError:
     from PyQt4.QtGui import *
     from PyQt4.QtCore import *
 
-#from PyQt4.QtOpenGL import *
+# from PyQt4.QtOpenGL import *
 
 from libs.shape import Shape
 from libs.utils import distance
@@ -17,6 +16,7 @@ CURSOR_POINT = Qt.PointingHandCursor
 CURSOR_DRAW = Qt.CrossCursor
 CURSOR_MOVE = Qt.ClosedHandCursor
 CURSOR_GRAB = Qt.OpenHandCursor
+
 
 # class Canvas(QGLWidget):
 
@@ -61,15 +61,17 @@ class Canvas(QWidget):
         self.forceFill = False
         self.hideVertices = False
         self.opaqueFill = False
+
         # Menus:
         self.menus = (QMenu(), QMenu())
+
         # Set widget options.
         self.setMouseTracking(True)
         self.setFocusPolicy(Qt.WheelFocus)
         self.verified = False
         self.drawSquare = False
 
-        #initialisation for panning
+        # initialisation for panning
         self.pan_initial_pos = QPoint()
 
     def setDrawingColor(self, qColor):
@@ -128,7 +130,7 @@ class Canvas(QWidget):
                 currentWidth = abs(self.current[0].x() - pos.x())
                 currentHeight = abs(self.current[0].y() - pos.y())
                 self.parent().window().labelCoordinates.setText(
-                        'Width: %d, Height: %d / X: %d; Y: %d' % (currentWidth, currentHeight, pos.x(), pos.y()))
+                    'Width: %d, Height: %d / X: %d; Y: %d' % (currentWidth, currentHeight, pos.x(), pos.y()))
 
                 color = self.drawingLineColor
                 if self.outOfPixmap(pos):
@@ -189,7 +191,7 @@ class Canvas(QWidget):
                 self.shapeMoved.emit()
                 self.repaint()
             else:
-                #pan
+                # pan
                 delta_x = pos.x() - self.pan_initial_pos.x()
                 delta_y = pos.y() - self.pan_initial_pos.y()
                 self.scrollRequest.emit(delta_x, Qt.Horizontal)
@@ -244,7 +246,7 @@ class Canvas(QWidget):
                 self.prevPoint = pos
 
                 if selection is None:
-                    #pan
+                    # pan
                     QApplication.setOverrideCursor(QCursor(Qt.OpenHandCursor))
                     self.pan_initial_pos = pos
 
@@ -257,8 +259,8 @@ class Canvas(QWidget):
         if ev.button() == Qt.RightButton:
             menu = self.menus[bool(self.selectedShapeCopy)]
             self.restoreCursor()
-            if not menu.exec_(self.mapToGlobal(ev.pos()))\
-               and self.selectedShapeCopy:
+            if not menu.exec_(self.mapToGlobal(ev.pos())) \
+                    and self.selectedShapeCopy:
                 # Cancel the move by deleting the shadow copy.
                 self.selectedShapeCopy = None
                 self.repaint()
@@ -272,14 +274,14 @@ class Canvas(QWidget):
             if self.drawing():
                 self.handleDrawing(pos)
             else:
-                #pan
+                # pan
                 QApplication.restoreOverrideCursor()
 
     def endMove(self, copy=False):
         assert self.selectedShape and self.selectedShapeCopy
         shape = self.selectedShapeCopy
-        #del shape.fill_color
-        #del shape.line_color
+        # del shape.fill_color
+        # del shape.line_color
         if copy:
             self.shapes.append(shape)
             self.selectedShape.selected = False
@@ -425,7 +427,7 @@ class Canvas(QWidget):
         # relative to the shape, but also results in making it
         # a bit "shaky" when nearing the border and allows it to
         # go outside of the shape's area for some reason. XXX
-        #self.calculateOffsets(self.selectedShape, pos)
+        # self.calculateOffsets(self.selectedShape, pos)
         dp = pos - self.prevPoint
         if dp:
             shape.moveBy(dp)
@@ -556,8 +558,8 @@ class Canvas(QWidget):
         self.update()
 
     def closeEnough(self, p1, p2):
-        #d = distance(p1 - p2)
-        #m = (p1-p2).manhattanLength()
+        # d = distance(p1 - p2)
+        # m = (p1-p2).manhattanLength()
         # print "d %.2f, m %d, %.2f" % (d, m, d - m)
         return distance(p1 - p2) < self.epsilon
 
@@ -602,49 +604,61 @@ class Canvas(QWidget):
             self.update()
         elif key == Qt.Key_Return and self.canCloseShape():
             self.finalise()
+        elif key == Qt.Key_Left and ev.modifiers() & Qt.ControlModifier and self.selectedShape:
+            self.moveTwoPixels('Left', False)
+        elif key == Qt.Key_Up and ev.modifiers() & Qt.ControlModifier and self.selectedShape:
+            self.moveTwoPixels('Up', False)
+        elif key == Qt.Key_Down and ev.modifiers() & Qt.ControlModifier and self.selectedShape:
+            self.moveTwoPixels('Down', False)
+        elif key == Qt.Key_Right and ev.modifiers() & Qt.ControlModifier and self.selectedShape:
+            self.moveTwoPixels('Right', False)
         elif key == Qt.Key_Left and self.selectedShape:
-            self.moveOnePixel('Left')
-        elif key == Qt.Key_Right and self.selectedShape:
-            self.moveOnePixel('Right')
+            self.moveTwoPixels('Left')
         elif key == Qt.Key_Up and self.selectedShape:
-            self.moveOnePixel('Up')
+            self.moveTwoPixels('Up')
         elif key == Qt.Key_Down and self.selectedShape:
-            self.moveOnePixel('Down')
+            self.moveTwoPixels('Down')
+        elif key == Qt.Key_Right and self.selectedShape:
+            self.moveTwoPixels('Right')
 
-    def moveOnePixel(self, direction):
+    def moveTwoPixels(self, direction, fix_tl=True):
         # print(self.selectedShape.points)
-        if direction == 'Left' and not self.moveOutOfBound(QPointF(-1.0, 0)):
+        if direction == 'Left' and not self.moveOutOfBound(QPointF(-2.0, 0)):
             # print("move Left one pixel")
-            self.selectedShape.points[0] += QPointF(-1.0, 0)
-            self.selectedShape.points[1] += QPointF(-1.0, 0)
-            self.selectedShape.points[2] += QPointF(-1.0, 0)
-            self.selectedShape.points[3] += QPointF(-1.0, 0)
-        elif direction == 'Right' and not self.moveOutOfBound(QPointF(1.0, 0)):
+            if fix_tl:
+                self.selectedShape.points[0] += QPointF(-2.0, 0)
+                self.selectedShape.points[3] += QPointF(-2.0, 0)
+            self.selectedShape.points[1] += QPointF(-2.0, 0)
+            self.selectedShape.points[2] += QPointF(-2.0, 0)
+        elif direction == 'Right' and not self.moveOutOfBound(QPointF(2.0, 0)):
             # print("move Right one pixel")
-            self.selectedShape.points[0] += QPointF(1.0, 0)
-            self.selectedShape.points[1] += QPointF(1.0, 0)
-            self.selectedShape.points[2] += QPointF(1.0, 0)
-            self.selectedShape.points[3] += QPointF(1.0, 0)
-        elif direction == 'Up' and not self.moveOutOfBound(QPointF(0, -1.0)):
+            if fix_tl:
+                self.selectedShape.points[0] += QPointF(2.0, 0)
+                self.selectedShape.points[3] += QPointF(2.0, 0)
+            self.selectedShape.points[1] += QPointF(2.0, 0)
+            self.selectedShape.points[2] += QPointF(2.0, 0)
+        elif direction == 'Up' and not self.moveOutOfBound(QPointF(0, -2.0)):
             # print("move Up one pixel")
-            self.selectedShape.points[0] += QPointF(0, -1.0)
-            self.selectedShape.points[1] += QPointF(0, -1.0)
-            self.selectedShape.points[2] += QPointF(0, -1.0)
-            self.selectedShape.points[3] += QPointF(0, -1.0)
-        elif direction == 'Down' and not self.moveOutOfBound(QPointF(0, 1.0)):
+            if fix_tl:
+                self.selectedShape.points[0] += QPointF(0, -2.0)
+                self.selectedShape.points[1] += QPointF(0, -2.0)
+            self.selectedShape.points[2] += QPointF(0, -2.0)
+            self.selectedShape.points[3] += QPointF(0, -2.0)
+        elif direction == 'Down' and not self.moveOutOfBound(QPointF(0, 2.0)):
             # print("move Down one pixel")
-            self.selectedShape.points[0] += QPointF(0, 1.0)
-            self.selectedShape.points[1] += QPointF(0, 1.0)
-            self.selectedShape.points[2] += QPointF(0, 1.0)
-            self.selectedShape.points[3] += QPointF(0, 1.0)
+            if fix_tl:
+                self.selectedShape.points[0] += QPointF(0, 2.0)
+                self.selectedShape.points[1] += QPointF(0, 2.0)
+            self.selectedShape.points[2] += QPointF(0, 2.0)
+            self.selectedShape.points[3] += QPointF(0, 2.0)
         self.shapeMoved.emit()
         self.repaint()
 
     def moveOutOfBound(self, step):
-        points = [p1+p2 for p1, p2 in zip(self.selectedShape.points, [step]*4)]
+        points = [p1 + p2 for p1, p2 in zip(self.selectedShape.points, [step] * 4)]
         return True in map(self.outOfPixmap, points)
 
-    def setLastLabel(self, text, line_color  = None, fill_color = None):
+    def setLastLabel(self, text, line_color=None, fill_color=None):
         assert text
         self.shapes[-1].label = text
         if line_color:
