@@ -306,6 +306,38 @@ class MainWindow(QMainWindow, WindowMixin):
         hide_vertices = action(text='&Hide\nvertices', slot=hide_vertices_,
                                shortcut='V', icon='hide', tip='Test', checkable=True)
 
+        def next_detection_():
+            def get_closest_below(from_point):
+                closest_below = None
+                closest_distance = sys.float_info.max
+
+                for shape in self.canvas.shapes:
+                    if shape.points[0].y() > from_point.y():  # Below
+                        distance = shape.points[0] - from_point
+                        norm = sqrt(distance.x() ** 2 + distance.y() ** 2)
+                        if norm < closest_distance:
+                            closest_distance = norm
+                            closest_below = shape
+                return closest_below
+
+            closest_below_current = get_closest_below(self.canvas.selectedShape.points[0])
+
+            if closest_below_current:
+                self.canvas.selectShape(closest_below_current)
+            else:  # Next column
+                top_of_column = get_closest_below(QPointF(self.canvas.selectedShape.points[0].x(), 0))
+                closest_to_the_right = get_closest_below(
+                    QPointF(top_of_column.points[1].x(), top_of_column.points[1].y() - 100))
+                if closest_to_the_right:
+                    self.canvas.selectShape(closest_to_the_right)
+                else:
+                    self.canvas.deSelectShape()
+
+            self.canvas.repaint()
+
+        next_detection = action(text='&Next\ndetection', slot=next_detection_,
+                                shortcut='TAB', tip='Test', checkable=False)
+
         help = action(getStr('tutorial'), self.showTutorialDialog, None, 'help', getStr('tutorialDetail'))
         showInfo = action(getStr('info'), self.showInfoDialog, None, 'help', getStr('info'))
 
@@ -382,7 +414,7 @@ class MainWindow(QMainWindow, WindowMixin):
                               fileMenuActions=(
                                   open, opendir, save, saveAs, close, resetAll, quit),
                               beginner=(), advanced=(),
-                              editMenu=(edit, copy, delete,
+                              editMenu=(edit, copy, delete, next_detection,
                                         None, color1, self.drawSquaresOption),
                               beginnerContext=(create, edit, copy, delete),
                               advancedContext=(createMode, editMode, edit, copy,
@@ -1170,7 +1202,7 @@ class MainWindow(QMainWindow, WindowMixin):
     def paintCanvas(self):
         assert not self.image.isNull(), "cannot paint null image"
         self.canvas.scale = 0.01 * self.zoomWidget.value()
-        self.canvas.labelFontSize = int(0.02 * max(self.image.width(), self.image.height()))
+        self.canvas.labelFontSize = 25
         self.canvas.adjustSize()
         self.canvas.update()
 
